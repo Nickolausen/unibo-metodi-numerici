@@ -13,7 +13,7 @@ def bisezione(a, b, fname, tolx, tolf, nmax):
     attempts = [c]
     
     def should_stop():
-        return len(attempts) > nmax or abs(fname(c)) <= tolf or abs(b_k - a_k) <= tolx
+        return len(attempts) >= nmax or abs(fname(c)) <= tolf or abs(b_k - a_k) <= tolx
     
     while (not should_stop()):
         res = fname(c)
