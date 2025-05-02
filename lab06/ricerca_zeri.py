@@ -10,10 +10,12 @@ def bisezione(a, b, fname, tolx, tolf, nmax):
     a_k = a
     b_k = b
     c = (a_k + b_k) / 2
-    attempts = [c]
+    attempts = [ c ]
     
     def should_stop():
-        return len(attempts) >= nmax or abs(fname(c)) <= tolf or abs(b_k - a_k) <= tolx
+        return len(attempts) > nmax or\
+            abs(fname(c)) <= tolf or\
+            abs(b_k - a_k) <= tolx
     
     while (not should_stop()):
         res = fname(c)
@@ -28,7 +30,7 @@ def bisezione(a, b, fname, tolx, tolf, nmax):
 
     return (c, len(attempts), attempts)
 
-def falsi(a, b, fname, tolx, tolf, nmax):
+def falsi(a: float, b: float, fname, tolx: float, tolf: float, nmax: int):
     """
     Calcola lo zero di una funzione via regula falsi.
     """
@@ -39,13 +41,16 @@ def falsi(a, b, fname, tolx, tolf, nmax):
     
     a_k = a
     b_k = b
-    x_k = a_k - fname(a_k) * ((b_k - a_k) / (fname(b_k) - fname(a_k)))
-    attempts = [x_k]
+    x_k = a_k + fname(a_k) * (b_k - a_k) / (fname(b_k) - fname(a_k))
+    attempts = [ x_k ]
+    x_prec = x_k + 1
 
     def should_stop():
-        # to change — abs(b_k - a_k) <= tolx
-        return len(attempts) > nmax or abs(fname(x_k)) <= tolf or abs(b_k - a_k) <= tolx
-    
+        error = abs(x_k - x_prec) / abs(x_k) if x_k != 0 else abs(x_k - x_prec)
+        return len(attempts) > nmax or\
+            abs(fname(x_k)) <= tolf or\
+            error <= tolx
+
     while (not should_stop()):
         res = fname(x_k)
         if (abs(fname(x_k)) <= tolf):
@@ -54,7 +59,8 @@ def falsi(a, b, fname, tolx, tolf, nmax):
             a_k = x_k
         else:
             b_k = x_k
-        x_k = a_k - fname(a_k) * ((b_k - a_k) / (fname(b_k) - fname(a_k)))
+        x_k = a_k + fname(a_k) * (b_k - a_k) / (fname(b_k) - fname(a_k))
         attempts.append(x_k)
+        x_prec = x_k
 
     return (x_k, len(attempts), attempts)
