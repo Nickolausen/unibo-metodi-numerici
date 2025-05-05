@@ -12,7 +12,7 @@ def bisezione(f, a, b, tolx, tolf, maxit):
     """
 
     # Se non viene rispettata l'ipotesi del Teorema dell'esistenza degli zeri, allora termina subito!
-    if (sign(f(a)) * sign(f(b)) >= 0):
+    if sign(f(a)) * sign(f(b)) >= 0:
         return None, None, None
     
     a_k = a
@@ -32,14 +32,16 @@ def bisezione(f, a, b, tolx, tolf, maxit):
         # Valuto la funzione sul nuovo punto medio
         result = f(guess)
 
-        # Stop conditions
-        if result == 0 or abs(result) <= tolf or abs(a_k - b_k) <= tolx or len(attempts) > maxit:
+        # Criteri di arresto
+        should_stop_f = abs(result) <= tolf
+        should_stop_x = (abs(a_k - b_k) / abs(a_k) if a_k != 0 else abs(a_k - b_k)) <= tolx
+        if result == 0 or should_stop_f or should_stop_x or len(attempts) > maxit:
             stop = True
         else:
             # Aggiornamento dell'intervallo per la prossima iterazione
             if sign(result) < 0:
                 a_k = guess
-            else:
+            elif sign(result) > 0:
                 b_k = guess
 
     return guess, len(attempts), attempts
@@ -50,7 +52,7 @@ def regula_falsi(f, a, b, tolx, tolf, maxit):
     """
     
     # Se non viene rispettata l'ipotesi del Teorema dell'esistenza degli zeri, allora termina subito!
-    if (sign(f(a)) * sign(f(b)) >= 0):
+    if sign(f(a)) * sign(f(b)) >= 0:
         return None, None, None
     
     # Estremi dell'intervallo in cui viene ricercato lo zero
@@ -76,22 +78,26 @@ def regula_falsi(f, a, b, tolx, tolf, maxit):
         attempts.append(guess)
         result = f(guess)
 
+
         # Stop conditions
-        if result == 0 or abs(result) <= tolf or abs(a_k - b_k) <= tolx or len(attempts) >= maxit:
+        should_stop_f = abs(result) <= tolf
+        should_stop_x = (abs(a_k - b_k) / abs(a_k) if a_k != 0 else abs(a_k - b_k)) <= tolx
+        if result == 0 or should_stop_f or should_stop_x or len(attempts) > maxit:
             stop = True
         else:
             # Aggiornamento dell'intervallo per la prossima iterazione
             if sign(result) < 0:
                 a_k = guess
-            else:
+            elif sign(result) > 0:
                 b_k = guess
-
+        
     return guess, len(attempts), attempts
 
 def corde(f, a, b, x0, tolx, tolf, maxit):
     """
     Convergenza locale - necessario parametro x0 per poter iniziare
     """
+    
     m = (f(b) - f(a))/(b - a)
     x_curr = x0
     x_next = None
@@ -101,14 +107,18 @@ def corde(f, a, b, x0, tolx, tolf, maxit):
     while not stop:
         x_next = x_curr - f(x_curr) / m
         attempts.append(x_next)
-        
         result = f(x_next)
-        if result == 0 or len(attempts) >= maxit:
+        
+        # Criteri di arresto
+        should_stop_f = abs(result) <= tolf
+        # Criterio di arresto relativo sulle x
+        should_stop_x = (abs(x_next - x_curr) / abs(x_next) if x_next != 0 else abs(x_next - x_curr)) <= tolx
+        if result == 0 or should_stop_f or should_stop_x or len(attempts) > maxit:
             stop = True
         else:
             # Progredisco nella successione di x_k
             x_curr = x_next
-
+            
     return x_next, len(attempts), attempts
 
 def secanti(f, x0, x1, tolx, tolf, maxit):
@@ -132,9 +142,13 @@ def secanti(f, x0, x1, tolx, tolf, maxit):
         m_k = (f(x_curr) - f(x_prev)) / (x_curr - x_prev)
         x_next = x_curr - f(x_curr) / m_k
         attempts.append(x_next)
-        
         result = f(x_next)
-        if result == 0 or len(attempts) >= maxit or abs(x_curr - x_next) <= tolx or abs(result) <= tolf:
+        
+        # Criteri di arresto
+        should_stop_f = abs(result) <= tolf
+        # Criterio di arresto relativo sulle x
+        should_stop_x = (abs(x_next - x_curr) / abs(x_next) if x_next != 0 else abs(x_next - x_curr)) <= tolx
+        if result == 0 or should_stop_f or should_stop_x or len(attempts) > maxit:
             stop = True
         else:
             # Progredisco nella successione di x_k
@@ -160,16 +174,31 @@ def newton(f_expr, x0, tolx, tolf, maxit):
 
     while not stop:
         # Controllo divisione per zero (o intorno)
-        if df(x_curr) <= np.spacing(1):
+        if abs(df(x_curr)) <= np.spacing(1):
             return None, None, None
         
         x_next = x_curr - f(x_curr) / df(x_curr)
-        attempts.append(x_next)
         
+        attempts.append(x_next)
         result = f(x_next)
-        if result == 0 or len(attempts) >= maxit or abs(x_curr - x_next) <= tolx or abs(result) <= tolf:
+        
+        # Criteri di arresto
+        should_stop_f = abs(result) <= tolf
+        # Criterio di arresto relativo alle x
+        should_stop_x = (abs(x_next - x_curr) / abs(x_next) if x_next != 0 else abs(x_next - x_curr)) <= tolx
+        if result == 0 or should_stop_f or should_stop_x or len(attempts) > maxit:
             stop = True
         else:
+            # Avanzamento del metodo
             x_curr = x_next
         
     return x_next, len(attempts), attempts
+
+def stima_ordine(xk):
+    if len(xk) < 4:
+        return None
+    
+    k = len(xk) - 4
+    num = np.log(abs(xk[k+2] - xk[k+3]) / abs(xk[k+1] - xk[k+2]))
+    den = np.log(abs(xk[k+1] - xk[k+2]) / abs(xk[k] - xk[k+1]))
+    return num / den
