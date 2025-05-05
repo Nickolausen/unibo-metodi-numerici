@@ -1,3 +1,31 @@
+## Soluzione equazioni non lineari
+
+### Bisezione
+
+### Regula Falsi
+1) Se $f(a) \cdot f(b) < 0$, allora: $a_0 = a,\quad b_0 = b$
+2) while (!arresto):
+3) 
+$$
+x_{k + 1} = a_k - f(a_k) \cdot \frac{b_k - a_k}{f(b_k) - f(a_k)}
+$$
+4) Se $f(x_{k + 1}) \cdot f(a_k) < 0$, allora $a_{k + 1} = a_k, \quad b_{k + 1} = x_{x + 1}$
+5) Altrimenti, se $f(x_{k + 1}) \cdot f(b_k) < 0$, allora $a_{k + 1} = x_{x + 1}, \quad b_{k + 1} = b_k$
+6) se $f(x_{k + 1}) = 0$, finito!
+### Linearizzazione
+
+#### $m_k$ costante — metodo delle corde
+
+· Scelgo $m_k = \frac{f(b) - f(a)}{b - a}$
+
+#### $m_k$ non costante — metodo delle secanti
+
+· Scelgo $m_k = \frac{f(x_k) - f(x_{k - 1})}{x_k - x_{k - 1}}$
+
+#### $m_k$ non costante — metodo di Newton
+
+· Scelgo $m_k = f'(x)$
+
 ## Soluzione di sistemi lineari
 
 ### Metodi diretti
