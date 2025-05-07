@@ -78,7 +78,6 @@ def regula_falsi(f, a, b, tolx, tolf, maxit):
         attempts.append(guess)
         result = f(guess)
 
-
         # Stop conditions
         should_stop_f = abs(result) <= tolf
         should_stop_x = (abs(a_k - b_k) / abs(a_k) if a_k != 0 else abs(a_k - b_k)) <= tolx
@@ -101,7 +100,7 @@ def corde(f, a, b, x0, tolx, tolf, maxit):
     m = (f(b) - f(a))/(b - a)
     x_curr = x0
     x_next = None
-    attempts = [  ]
+    attempts = [ ]
     stop = False
     
     while not stop:
